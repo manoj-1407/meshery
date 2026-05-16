@@ -115,6 +115,11 @@ func (h *Handler) GetWorkspacesHandler(w http.ResponseWriter, req *http.Request,
 
 func (h *Handler) GetWorkspaceByIdHandler(w http.ResponseWriter, r *http.Request, _ *models.Preference, _ *models.User, provider models.Provider) {
 	workspaceID := mux.Vars(r)["id"]
+	if workspaceID == "" {
+		h.log.Error(ErrGetResult(fmt.Errorf("workspace ID is missing")))
+		writeJSONError(w, "workspace ID is missing", http.StatusBadRequest)
+		return
+	}
 	q := r.URL.Query()
 	// Canonical form is `orgId`; `orgID` is dual-accepted during the Phase 2
 	// deprecation window. Retire once Phase 3 consumer migration completes.
@@ -179,6 +184,11 @@ func (h *Handler) SaveWorkspaceHandler(w http.ResponseWriter, req *http.Request,
 
 func (h *Handler) DeleteWorkspaceHandler(w http.ResponseWriter, r *http.Request, _ *models.Preference, _ *models.User, provider models.Provider) {
 	workspaceID := mux.Vars(r)["id"]
+	if workspaceID == "" {
+		h.log.Error(ErrGetResult(fmt.Errorf("workspace ID is missing")))
+		writeJSONError(w, "workspace ID is missing", http.StatusBadRequest)
+		return
+	}
 	resp, err := provider.DeleteWorkspace(r, workspaceID)
 	if err != nil {
 		h.log.Error(ErrGetResult(err))
